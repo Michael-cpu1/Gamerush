@@ -1,39 +1,53 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Block Jumper</title>
-<style>
-html,body{margin:0;height:100%;overflow:hidden;background:#111827;font-family:system-ui;color:white}
-canvas{display:block;width:100%;height:100%}
-#t{position:fixed;top:12px;left:12px;background:#0008;padding:9px 12px;border-radius:10px}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GameZone</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-<div id="t">Move A/D or arrows · Jump SPACE</div>
-<canvas id="c"></canvas>
-<script>
-const c=document.getElementById('c'),ctx=c.getContext('2d');
-let W,H,keys={},p,plats;
-function resize(){c.width=innerWidth*devicePixelRatio;c.height=innerHeight*devicePixelRatio;ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);W=innerWidth;H=innerHeight;reset()}
-function reset(){p={x:80,y:H-180,w:38,h:50,vx:0,vy:0,on:false};plats=[{x:0,y:H-60,w:W,h:60},{x:220,y:H-155,w:180,h:24},{x:500,y:H-245,w:180,h:24},{x:800,y:H-330,w:200,h:24}]}
-addEventListener('resize',resize);resize();
-addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=1;if((e.key===' '||e.key==='ArrowUp')&&p.on){p.vy=-650;p.on=false}});
-addEventListener('keyup',e=>keys[e.key.toLowerCase()]=0);
-let last=performance.now();
-function loop(t){let dt=Math.min(.025,(t-last)/1000);last=t;
- let dir=(keys['d']||keys['arrowright']?1:0)-(keys['a']||keys['arrowleft']?1:0);p.vx=dir*320;p.vy+=1500*dt;
- p.x+=p.vx*dt;p.x=Math.max(0,Math.min(W-p.w,p.x));
- let oldY=p.y;p.y+=p.vy*dt;p.on=false;
- for(const q of plats){if(p.vy>=0&&oldY+p.h<=q.y&&p.y+p.h>=q.y&&p.x+p.w>q.x&&p.x<q.x+q.w){p.y=q.y-p.h;p.vy=0;p.on=true}}
- if(p.y>H+100) reset();
- ctx.clearRect(0,0,W,H);let g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#111c3f');g.addColorStop(1,'#08111f');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
- ctx.fillStyle='#59657a';for(const q of plats)ctx.fillRect(q.x,q.y,q.w,q.h);
- ctx.fillStyle='#53a8ff';ctx.fillRect(p.x,p.y,p.w,p.h);
- ctx.fillStyle='white';ctx.font='bold 22px system-ui';ctx.fillText('Reach the highest platform!',20,68);
- requestAnimationFrame(loop)}
-requestAnimationFrame(loop);
-</script>
+  <header class="topbar">
+    <div>
+      <h1>🎮 GameZone</h1>
+      <p>Play your games in one place.</p>
+    </div>
+    <input id="search" type="text" placeholder="Search games..." />
+  </header>
+
+  <main>
+    <section class="hero">
+      <div>
+        <span class="badge">YOUR GAME HUB</span>
+        <h2>Pick a game and start playing.</h2>
+        <p>Add more games by putting their folders inside <b>/games</b> and adding them to <b>games.js</b>.</p>
+      </div>
+    </section>
+
+    <section>
+      <h3 class="section-title">Games</h3>
+      <div id="gameGrid" class="game-grid"></div>
+      <p id="emptyMessage" class="empty hidden">No games found.</p>
+    </section>
+  </main>
+
+  <div id="playerModal" class="modal hidden" aria-hidden="true">
+    <div class="modal-panel">
+      <div class="modal-bar">
+        <div>
+          <strong id="playerTitle">Game</strong>
+          <span id="playerCategory"></span>
+        </div>
+        <div class="actions">
+          <button id="fullscreenBtn">⛶ Fullscreen</button>
+          <button id="closeBtn">✕ Close</button>
+        </div>
+      </div>
+      <iframe id="gameFrame" title="Game player" allow="fullscreen; autoplay; gamepad"></iframe>
+    </div>
+  </div>
+
+  <script src="games.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
